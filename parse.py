@@ -22,14 +22,15 @@ class MeCabToken:
     }
 
   infl_map = {
-    'ク語法': 'ku_wording',
+    'ク語法': '"ku" wording',
     '仮定形': 'conditional',
     '命令形': 'imperative',
     '已然形': 'realis',
-    '意志推量形': 'volitional_tentative',
+    '意志推量形': 'volitional tentative',
+    '連用タ接続': 'continuous "ta" connection',
     '未然形': 'irrealis',
     '終止形': 'conclusive',
-    '語幹': 'word_stem',
+    '語幹': 'word stem',
     '連体形': 'attributive',
     '連用形': 'continuative',
     '基本形': 'regular form',
@@ -58,13 +59,21 @@ while True:
   lines = [line for line in result.split('\n') if '\t' in line]
   tokens = [MeCabToken(line) for line in lines]
 
-  for i, t in enumerate(tokens):
-    if t.pos != 'verb':
-      continue
-    info = str(t)
-    j = i + 1
-    while j < len(tokens) and tokens[j].pos == 'auxiliary verb':
-      info += ' + ' + str(tokens[j])
-      j += 1
-    print(info)
+  pos_str = ' '.join(t.text + '/' + t.pos for t in tokens)
+  print(pos_str + '\n')
 
+  pred_str = None
+  for i, t in enumerate(tokens):
+    if pred_str == None and t.pos == 'verb':
+      pred_str = str(t)
+    elif pred_str != None:
+      if t.pos in ['auxiliary verb', 'verb']:
+        pred_str += ' + ' + str(t)
+      elif t.pos == 'particle':
+        pred_str += ' + ' + t.text + ' (particle)'
+      else:
+        print('PREDICATE: ' + pred_str)
+        pred_str = None
+
+  if pred_str != None:
+    print('PREDICATE: ' + pred_str)

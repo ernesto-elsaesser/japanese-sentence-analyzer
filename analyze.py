@@ -1,5 +1,8 @@
+import sys
+import json
 import MeCab
-from jamdict import Jamdict
+
+text = sys.argv[1]
 
 class MeCabToken:
 
@@ -52,34 +55,23 @@ class MeCabToken:
     self.infl = self.infl_map[fields[5]]
     self.lemma = fields[6]
 
+print('Loading ...')
+with open('jmdict.json', 'r') as f:
+  jmdict = json.load(f)
+print('Done.')
 
 tagger = MeCab.Tagger()
-jmdict = Jamdict(strict_lookup=True, lookup_chars=False)
+result = tagger.parse(text)
+lines = [line for line in result.split('\n') if '\t' in line]
+tokens = [MeCabToken(line) for line in lines]
 
-while True:
-  text = input('\nJapanese sentence (or q to quit): ')
-  if text == 'q':
-    break
-
-  result = tagger.parse(text)
-  lines = [line for line in result.split('\n') if '\t' in line]
-  tokens = [MeCabToken(line) for line in lines]
-
-  for t in tokens:
-    infl_str = ''
-    if t.lemma != t.text:
-      infl_str = f' - {t.infl} of {t.lemma}'
-    print(f'\n{t.text} [{t.pos}{infl_str}]')
-    entries = jmdict.lookup(t.lemma).entries
-    for entry in entries:
-      forms = entry.kanji_forms + entry.kana_forms
-      form_str = ', '.join(str(f) for f in forms)
-      pos_match = False
-      for sense in entry.senses:
-        pos = ' | '.join(sense.pos)
-        if pos != '':
-          pos_match = t.pos in pos
-          if pos_match:
-            print('  ' + form_str + ': ' + pos)
-        if pos_match:
-          print('    ' + sense.text(compact=True))
+for t in tokens:
+  infl_str = ''
+  if t.lemma != t.text:
+    infl_str = f' - {t.infl} of {t.lemma}'
+  print(f'\n{t.text} [{t.pos}{infl_str}]')
+  if t.lemma not in jmdict:
+    continue
+  entries = jmdict[t.lemma]
+  for e in entries:
+    print('  ' + e[0] + ': ' + e[1])

@@ -100,10 +100,14 @@
 
             "一般": "general",
             "係助詞": "binding",
+            "格助詞": "case",
+            "自立": "independent",
             "非自立": "not independent",
             "副詞可能": "possible adverb",
             "連体化": "noun-modifying",
             "助動詞語幹": "auxiliary",
+            "引用": "quotative",
+            "サ変接続": "suru-verbal",
         }
         INFLECTIONS = {
             '語幹': 'stem',
@@ -131,7 +135,7 @@
         const output = document.getElementById("output")
 
         function present(tokens) {
-            let table = "<tr><th>Token</th><th>Reading</th><th>POS</th><th>Root</th><th>Conjugation</th></tr>"
+            let table = "<tr><th>Token</th><th>Reading</th><th>POS</th><th>Conjugation</th><th>Translation</th></tr>"
 
             for (let token of tokens) {
                 pos = token["pos"]
@@ -144,6 +148,10 @@
                 conjugated_type = token["conjugated_type"]
                 conjugated_form = token["conjugated_form"]
 
+                if (basic_form != surface_form && basic_form != "*") surface_form = surface_form + " (" + basic_form + ")"
+                table += "<tr><td>" + surface_form + "</td>"
+                table += "<td>" + reading + "</td>"
+
                 pos_en = TAGS[pos]
                 pos_jp = pos
                 if (pos1 != "*") pos_en += ", " + TAGS[pos1]
@@ -153,12 +161,13 @@
                 if (pos3 != "*") pos_en += ", " + TAGS[pos3]
                 if (pos3 != "*") pos_jp += ", " + pos3
 
-                table += "<tr><td>" + surface_form + "</td>"
-                table += "<td>" + reading + "</td>"
                 table += "<td>" + pos_en + " (" + pos_jp + ")</td>"
-                table += "<td>" + basic_form + "</td>"
+
                 if (conjugated_type == "*") table += "<td></td>"
                 else table += "<td>" + INFLECTIONS[conjugated_form] + ": " + conjugated_type + "</td>"
+
+                table += "<td>?</td>"
+
                 table += "</tr>"
             }
             output.innerHTML = table

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Morphological Analyzer</title>
+    <script src="kuromoji.js"></script>
+    <style>
+    </style>
+</head>
+<body>
+
+    <input type="text" id="input" value="すもももももももものうち" />
+    <button id="button" disabled>Loading</button>
+    <p id="output"></p>
+
+    <script>
+
+/*
+"代名詞": "pronoun",
+"副詞": "adverb",
+"助動詞": "auxiliary_verb",
+"助詞-係助詞": "particle(binding)",
+"助詞-副助詞": "particle(adverbial)",
+"助詞-接続助詞": "particle(conjunctive)",
+"助詞-格助詞": "particle(case)",
+"助詞-準体助詞": "particle(nominal)",
+"助詞-終助詞": "particle(phrase_final)",
+"動詞-一般": "verb(general)",
+"動詞-非自立可能": "verb(bound)",
+"名詞-助動詞語幹": "noun(auxiliary)",
+"名詞-固有名詞-一般": "noun(proper.general)",
+"名詞-固有名詞-人名-一般": "noun(proper.name.general)",
+"名詞-固有名詞-人名-名": "noun(proper.name.firstname)",
+"名詞-固有名詞-人名-姓": "noun(proper.name.surname)",
+"名詞-固有名詞-地名-一般": "noun(proper.place.general)",
+"名詞-固有名詞-地名-国": "noun(proper.place.country)",
+"名詞-数詞": "noun(numeral)",
+"名詞-普通名詞-サ変可能": "noun(common.verbal_suru)",
+"名詞-普通名詞-サ変形状詞可能": "noun(common.verbal.adjectival)",
+"名詞-普通名詞-一般": "noun(common.general)",
+"名詞-普通名詞-副詞可能": "noun(common.adverbial)",
+"名詞-普通名詞-助数詞可能": "noun(common.counter)",
+"名詞-普通名詞-形状詞可能": "noun(common.adjectival)",
+"形容詞-一般": "adjective_i(general)",
+"形容詞-非自立可能": "adjective_i(bound)",
+"形状詞-タリ": "adjectival_noun(tari)",
+"形状詞-一般": "adjectival_noun(general)",
+"形状詞-助動詞語幹": "adjectival_noun(auxiliary)",
+"感動詞-フィラー": "interjection(filler)",
+"感動詞-一般": "interjection(general)",
+"接尾辞-動詞的": "suffix(verbal)",
+"接尾辞-名詞的-サ変可能": "suffix(nominal.verbal_suru)",
+"接尾辞-名詞的-一般": "suffix(nominal.general)",
+"接尾辞-名詞的-副詞可能": "suffix(nominal.adverbial)",
+"接尾辞-名詞的-助数詞": "suffix(nominal.counter)",
+"接尾辞-形容詞的": "suffix(adjective_i)",
+"接尾辞-形状詞的": "suffix(adjectival_noun)",
+"接続詞": "conjunction",
+"接頭辞": "prefix",
+"空白": "whitespace",
+"補助記号-ＡＡ-一般": "supplementary_symbol(ascii_art.general)",
+"補助記号-ＡＡ-顔文字": "supplementary_symbol(ascii_art.emoticon)",
+"補助記号-一般": "supplementary_symbol(general)",
+"補助記号-句点": "supplementary_symbol(period)",
+"補助記号-括弧閉": "supplementary_symbol(bracketopen)",
+"補助記号-括弧開": "supplementary_symbol(bracketclose)",
+"補助記号-読点": "supplementary_symbol(comma)",
+"記号-一般": "symbol(general)",
+"記号-文字": "symbol(character)",
+"連体詞": "adnominal",
+*/
+
+        TAGS = {
+            '動詞': 'verb',
+            '名詞': 'noun',
+            '形容詞': 'adjective',
+            '代名詞': 'pronoun',
+            '副詞': 'adverb',
+            '連体詞': 'adnominal',
+            '助動詞': 'auxiliary verb',
+            '助詞': 'particle',
+            '感動詞': 'interjection',
+            '接頭辞': 'prefix',
+            '接続詞': 'conjunction',
+            '接尾辞': 'suffix',
+            '空白': 'whitespace',
+            '補助記号': 'supplementary symbol',
+            '記号': 'symbol',
+
+            "一般": "general",
+            "係助詞": "binding",
+            "非自立": "not independent",
+            "副詞可能": "possible adverb",
+            "連体化": "noun-modifying",
+            "助動詞語幹": "auxiliary",
+        }
+        INFLECTIONS = {
+            '語幹': 'stem',
+
+            '未然形': 'negative base',
+
+            '意志推量形': 'volitive base',
+
+            '連用形': 'masu base',
+            '連用タ接続': 'te base',
+
+            '終止形': 'terminal form',
+            '基本形': 'regular form',
+            '已然形': 'positive base',
+            '連体形': 'attributive base',
+
+            '仮定形': 'hypothetic base',
+            '命令形': 'imperative base',
+
+            'ク語法': 'nominalized "ku" form',
+        }
+
+        const input = document.getElementById("input")
+        const button = document.getElementById("button")
+        const output = document.getElementById("output")
+
+        function present(tokens) {
+            let result = ""
+            for (let token of tokens) {
+                pos = token["pos"]
+                pos1 = token["pos_detail_1"]
+                pos2 = token["pos_detail_2"]
+                pos3 = token["pos_detail_3"]
+                surface_form = token["surface_form"]
+                basic_form = token["basic_form"]
+                conjugated_type = token["conjugated_type"]
+                conjugated_form = token["conjugated_form"]
+                reading = token["reading"]
+
+                pos_en = TAGS[pos] + ", " + TAGS[pos1]
+                pos_jp = pos + " " + pos1
+                if (pos2 != "*") pos_en += ", " + TAGS[pos2]
+                if (pos2 != "*") pos_jp += " " + pos2
+                if (pos3 != "*") pos_en += ", " + TAGS[pos3]
+                if (pos3 != "*") pos_jp += " " + pos3
+
+                result += surface_form + " [" + reading + "] - "
+                result += "<b>" + pos_en + "</b> (" + pos_jp + ")<br/>"
+                if (basic_form != surface_form) result += " - BASIC: " + basic_form + "<br/>"
+                if (conjugated_form != "*") result += " - CONJ: " + conjugated_form + " (" + INFLECTION[conjugated_type] + ")<br/>"
+            }
+            output.innerHTML = result
+        }
+
+        kuromoji.builder({ dicPath: "dict" }).build(function (err, tokenizer) {
+            button.onclick = () => present(tokenizer.tokenize(input.value))
+            button.innerText = "Tokenize"
+            button.disabled = false
+        });
+
+    </script>
+</body>

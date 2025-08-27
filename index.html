@@ -81,7 +81,7 @@
 "連体詞": "adnominal",
 */
 
-        TAGS = {
+        const TAGS = {
             '動詞': 'verb',
             '名詞': 'noun',
             '形容詞': 'adjective',
@@ -109,7 +109,8 @@
             "引用": "quotative",
             "サ変接続": "suru-verbal",
         }
-        INFLECTIONS = {
+
+        const INFLECTIONS = {
             '語幹': 'stem',
 
             '未然形': 'negative base',
@@ -134,16 +135,31 @@
         const button = document.getElementById("button")
         const output = document.getElementById("output")
 
+        async function lookup(word_id, word) {
+            const res = await fetch("dic.php?q=" + word)
+            const html = await res.text()
+            const lines = html.split("\n")
+            const preIndex = lines.indexOf("<pre>")
+            const td = document.getElementById(word_id)
+            let result = "---"
+            if (preIndex != -1) {
+                const match = lines[preIndex + 1]
+                result = match.split("/").slice(1).join("; ")
+            }
+            td.innerText = result
+        }
+
         function present(tokens) {
             let table = "<tr><th>Token</th><th>Reading</th><th>POS</th><th>Conjugation</th><th>Translation</th></tr>"
 
             for (let token of tokens) {
+                word_id = token["word_id"].toString()
+                surface_form = token["surface_form"]
+                reading = token["reading"] || ""
                 pos = token["pos"]
                 pos1 = token["pos_detail_1"]
                 pos2 = token["pos_detail_2"]
                 pos3 = token["pos_detail_3"]
-                surface_form = token["surface_form"]
-                reading = token["reading"] || ""
                 basic_form = token["basic_form"]
                 conjugated_type = token["conjugated_type"]
                 conjugated_form = token["conjugated_form"]
@@ -161,14 +177,20 @@
                 if (pos3 != "*") pos_en += ", " + TAGS[pos3]
                 if (pos3 != "*") pos_jp += ", " + pos3
 
-                table += "<td>" + pos_en + " (" + pos_jp + ")</td>"
+                table += "<td>" + pos_en + "<br/>" + pos_jp + "</td>"
 
                 if (conjugated_type == "*") table += "<td></td>"
                 else table += "<td>" + INFLECTIONS[conjugated_form] + ": " + conjugated_type + "</td>"
 
-                table += "<td>?</td>"
+                if (surface_form.length > 1) {
+                    table += '<td id="' + word_id + '">...</td>'
+                    lookup(word_id, surface_form)
+                } else {
+                    table += '<td></td>'
+                }
 
                 table += "</tr>"
+
             }
             output.innerHTML = table
         }

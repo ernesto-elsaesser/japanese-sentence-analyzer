@@ -6,13 +6,23 @@
     <title>Japanese Morphological Analyzer</title>
     <script src="kuromoji.js"></script>
     <style>
+        table {
+            border: 1px solid;
+        }
+        th, td {
+            border: 1px solid;
+            padding: 5px 10px;
+        }
     </style>
 </head>
 <body>
 
-    <input type="text" id="input" value="すもももももももものうち" />
+    <textarea id="input" cols="64">引数にファイルを与えると, そのファイルが解析対象となります</textarea>
     <button id="button" disabled>Loading</button>
-    <p id="output"></p>
+
+    <table>
+        <tbody id="output"></tbody>
+    </table>
 
     <script>
 
@@ -121,31 +131,37 @@
         const output = document.getElementById("output")
 
         function present(tokens) {
-            let result = ""
+            let table = "<tr><th>Token</th><th>Reading</th><th>POS</th><th>Root</th><th>Conjugation</th></tr>"
+
             for (let token of tokens) {
                 pos = token["pos"]
                 pos1 = token["pos_detail_1"]
                 pos2 = token["pos_detail_2"]
                 pos3 = token["pos_detail_3"]
                 surface_form = token["surface_form"]
+                reading = token["reading"] || ""
                 basic_form = token["basic_form"]
                 conjugated_type = token["conjugated_type"]
                 conjugated_form = token["conjugated_form"]
-                reading = token["reading"]
 
-                pos_en = TAGS[pos] + ", " + TAGS[pos1]
-                pos_jp = pos + " " + pos1
+                pos_en = TAGS[pos]
+                pos_jp = pos
+                if (pos1 != "*") pos_en += ", " + TAGS[pos1]
+                if (pos1 != "*") pos_jp += ", " + pos1
                 if (pos2 != "*") pos_en += ", " + TAGS[pos2]
-                if (pos2 != "*") pos_jp += " " + pos2
+                if (pos2 != "*") pos_jp += ", " + pos2
                 if (pos3 != "*") pos_en += ", " + TAGS[pos3]
-                if (pos3 != "*") pos_jp += " " + pos3
+                if (pos3 != "*") pos_jp += ", " + pos3
 
-                result += surface_form + " [" + reading + "] - "
-                result += "<b>" + pos_en + "</b> (" + pos_jp + ")<br/>"
-                if (basic_form != surface_form) result += " - BASIC: " + basic_form + "<br/>"
-                if (conjugated_form != "*") result += " - CONJ: " + conjugated_form + " (" + INFLECTION[conjugated_type] + ")<br/>"
+                table += "<tr><td>" + surface_form + "</td>"
+                table += "<td>" + reading + "</td>"
+                table += "<td>" + pos_en + " (" + pos_jp + ")</td>"
+                table += "<td>" + basic_form + "</td>"
+                if (conjugated_type == "*") table += "<td></td>"
+                else table += "<td>" + INFLECTIONS[conjugated_form] + ": " + conjugated_type + "</td>"
+                table += "</tr>"
             }
-            output.innerHTML = result
+            output.innerHTML = table
         }
 
         kuromoji.builder({ dicPath: "dict" }).build(function (err, tokenizer) {

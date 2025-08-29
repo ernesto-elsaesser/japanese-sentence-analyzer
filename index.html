@@ -102,6 +102,11 @@
         const button = document.getElementById("run")
         const output = document.getElementById("output")
 
+        function translate(tag) {
+            if (tag in TAGS) return TAG[tag]
+            return "?"
+        }
+
         function present(tokens) {
             let rows = ""
 
@@ -126,15 +131,9 @@
                 if (is_kanji) rows += "<br/>" + reading
                 rows += "</td>"
 
-                pos_en = TAGS[pos]
-                pos_jp = pos
-                if (pos1 != "*") pos_en += ", " + TAGS[pos1]
-                if (pos1 != "*") pos_jp += ", " + pos1
-                if (pos2 != "*") pos_en += ", " + TAGS[pos2]
-                if (pos2 != "*") pos_jp += ", " + pos2
-                if (pos3 != "*") pos_en += ", " + TAGS[pos3]
-                if (pos3 != "*") pos_jp += ", " + pos3
-                rows += "<td>" + pos_en + "<br/>" + pos_jp
+                tagsJP = [pos, pos1, pos2, pos3].filter(t => t != "*")
+                tagsEN = tagsJP.map(t => t in TAGS ? TAGS[t] : "?")
+                rows += "<td>" + tagsEN.join(", ") + "<br/>" + tagsJP.join(", ")
                 if (conjugated_type != "*") {
                     rows += "<br/>" + INFLECTIONS[conjugated_form] + " of " + basic_form + " (" + conjugated_type + ")"
                 }

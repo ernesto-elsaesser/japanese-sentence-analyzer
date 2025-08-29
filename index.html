@@ -41,74 +41,91 @@
 
     <script>
 
-        // see also https://www.sketchengine.eu/tagset-jp-mecab/
+        // https://github.com/taku910/mecab/blob/master/mecab-ipadic/pos-id.def
         const TAGS = {
-            "一般": "general",
-            "自立": "independent",
-            "非自立": "dependent",
-            "非自立可能": "bound",
-
-            // verbs
-            '動詞': 'verb',
-            '助動詞': 'auxiliary verb',
-            '感動詞': 'interjection',
-            "動詞的": "verbal",
-
-            // nouns
-            '名詞': 'noun',
-            '代名詞': 'pronoun',
-            "固有名詞": "proper",
-            "地域": "toponym",
-            "人名": "name",
-            "助数詞": "counter",
-            "サ変接続": "suru-verbal",
-            "名詞的": "nominal",
-
-            // adjectives
-            '形容詞': 'adjective',
-
-            // adverbs
-            '副詞': 'adverb',
-            "副詞可能": "adverbial",
-
-            
-            // particles
-            '助詞': 'particle',
-            "係助詞": "binding",
-            "格助詞": "case-marking",
-            "並立助詞": "connecting",
-            "接続助詞": "conjunctive",
-            "終助詞": "phrase-final",
-            "連体化": "noun-modifying",
-            "準体助詞": "nominal",
-
-            // other
-            '連体詞': 'adnominal',
-            '接頭辞': 'prefix',
-            '接続詞': 'conjunction',
-            '接尾辞': 'suffix',
-            "引用": "quotative",
-
-            // symbols
-            '補助記号': 'supplementary symbol',
-            '記号': 'symbol',
-            '空白': 'whitespace',
-            "句点": "period",
+            "フィラー,*,*,*": "Filler",
+            "感動詞,*,*,*": "Interjection",
+            "記号,アルファベット,*,*": "Symbol: Alphabet",
+            "記号,一般,*,*": "Symbol: General",
+            "記号,括弧開,*,*": "Symbol: Opening Bracket",
+            "記号,括弧閉,*,*": "Symbol: Closing Bracket",
+            "記号,句点,*,*": "Symbol: Period",
+            "記号,空白,*,*": "Symbol: Space",
+            "記号,読点,*,*": "Symbol: Comma",
+            "形容詞,自立,*,*": "Adjective: Independent",
+            "形容詞,接尾,*,*": "Adjective: Suffix",
+            "形容詞,非自立,*,*": "Adjective: Dependent",
+            "助詞,格助詞,一般,*": "Particle: Case-marking Particle: General",
+            "助詞,格助詞,引用,*": "Particle: Case-marking Particle: Quotation",
+            "助詞,格助詞,連語,*": "Particle: Case-marking Particle: Collocation",
+            "助詞,係助詞,*,*": "Particle: Binding Particle",
+            "助詞,終助詞,*,*": "Particle: Sentence-final Particle",
+            "助詞,接続助詞,*,*": "Particle: Conjunctional Particle",
+            "助詞,特殊,*,*": "Particle: Special",
+            "助詞,副詞化,*,*": "Particle: Adverbialization",
+            "助詞,副助詞,*,*": "Particle: Adverbial Particle",
+            "助詞,副助詞／並立助詞／終助詞,*,*": "Particle: Adverbial/Coordinate/Sentence-final Particle",
+            "助詞,並立助詞,*,*": "Particle: Coordinate Particle",
+            "助詞,連体化,*,*": "Particle: Adnominalization",
+            "助動詞,*,*,*": "Auxiliary Verb",
+            "接続詞,*,*,*": "Conjunction",
+            "接頭詞,形容詞接続,*,*": "Prefix: Adjective-connecting",
+            "接頭詞,数接続,*,*": "Prefix: Number-connecting",
+            "接頭詞,動詞接続,*,*": "Prefix: Verb-connecting",
+            "接頭詞,名詞接続,*,*": "Prefix: Noun-connecting",
+            "動詞,自立,*,*": "Verb: Independent",
+            "動詞,接尾,*,*": "Verb: Suffix",
+            "動詞,非自立,*,*": "Verb: Dependent",
+            "副詞,一般,*,*": "Adverb: General",
+            "副詞,助詞類接続,*,*": "Adverb: Particle-connecting",
+            "名詞,サ変接続,*,*": "Noun: Sahen-suru Verb",
+            "名詞,ナイ形容詞語幹,*,*": "Noun: Na-adjective Stem",
+            "名詞,一般,*,*": "Noun: General",
+            "名詞,引用文字列,*,*": "Noun: Quoted String",
+            "名詞,形容動詞語幹,*,*": "Noun: Adjectival Noun Stem",
+            "名詞,固有名詞,一般,*": "Noun: Proper Noun: General",
+            "名詞,固有名詞,人名,一般": "Noun: Proper Noun: Person's Name: General",
+            "名詞,固有名詞,人名,姓": "Noun: Proper Noun: Person's Name: Surname",
+            "名詞,固有名詞,人名,名": "Noun: Proper Noun: Person's Name: First Name",
+            "名詞,固有名詞,組織,*": "Noun: Proper Noun: Organization",
+            "名詞,固有名詞,地域,一般": "Noun: Proper Noun: Regional: General",
+            "名詞,固有名詞,地域,国": "Noun: Proper Noun: Regional: Country",
+            "名詞,数,*,*": "Noun: Number",
+            "名詞,接続詞的,*,*": "Noun: Conjunctional",
+            "名詞,接尾,サ変接続,*": "Noun: Suffix: Sahen-suru Verb",
+            "名詞,接尾,一般,*": "Noun: Suffix: General",
+            "名詞,接尾,形容動詞語幹,*": "Noun: Suffix: Adjectival Noun Stem",
+            "名詞,接尾,助数詞,*": "Noun: Suffix: Counter",
+            "名詞,接尾,助動詞語幹,*": "Noun: Suffix: Auxiliary Verb Stem",
+            "名詞,接尾,人名,*": "Noun: Suffix: Person's Name",
+            "名詞,接尾,地域,*": "Noun: Suffix: Regional",
+            "名詞,接尾,特殊,*": "Noun: Suffix: Special",
+            "名詞,接尾,副詞可能,*": "Noun: Suffix: Adverbial",
+            "名詞,代名詞,一般,*": "Noun: Pronoun: General",
+            "名詞,代名詞,縮約,*": "Noun: Pronoun: Contraction",
+            "名詞,動詞非自立的,*,*": "Noun: Verb-like Dependent",
+            "名詞,特殊,助動詞語幹,*": "Noun: Special: Auxiliary Verb Stem",
+            "名詞,非自立,一般,*": "Noun: Dependent: General",
+            "名詞,非自立,形容動詞語幹,*": "Noun: Dependent: Adjectival Noun Stem",
+            "名詞,非自立,助動詞語幹,*": "Noun: Dependent: Auxiliary Verb Stem",
+            "名詞,非自立,副詞可能,*": "Noun: Dependent: Adverbial",
+            "名詞,副詞可能,*,*": "Noun: Adverbial",
+            "連体詞,*,*,*": "Adnominal Adjective"
         }
 
         const INFLECTIONS = {
-            '語幹': 'stem',
-            '未然形': 'negative base',
-            '意志推量形': 'volitive base',
-            '連用形': 'masu base',
-            '連用タ接続': 'te base',
-            '終止形': 'terminal form',
-            '基本形': 'regular form',
-            '已然形': 'positive base',
-            '連体形': 'attributive base',
-            '仮定形': 'hypothetic base',
-            '命令形': 'imperative base',
-            'ク語法': 'nominalized "ku" form',
+            '語幹': 'Stem',
+            '未然形': 'Negative base',
+            '意志推量形': 'Volitive base',
+            '連用形': 'MASU base',
+            '連用タ接続': 'TE base',
+            '終止形': 'Terminal form',
+            '基本形': 'Regular form',
+            '已然形': 'Positive base',
+            '連体形': 'Attributive base',
+            '仮定形': 'Hypothetic base',
+            '命令形': 'Imperative base',
+            'ク語法': 'Nominalized KU form',
         }
 
         const input = document.getElementById("input")
@@ -144,9 +161,9 @@
                 if (is_kanji) rows += "<br/>" + reading
                 rows += "</td>"
 
-                tagsJP = [pos, pos1, pos2, pos3].filter(t => t != "*")
-                tagsEN = tagsJP.map(t => t in TAGS ? TAGS[t] : "?")
-                rows += "<td>" + tagsEN.join(", ") + "<br/>" + tagsJP.join(", ")
+                tags = [pos, pos1, pos2, pos3]
+                rows += "<td>" + TAGS[tags.join(",")]
+                rows += "<br/>" + tags.filter(t => t != "*").join(", ")
                 if (conjugated_type != "*") {
                     rows += "<br/>" + INFLECTIONS[conjugated_form] + " of " + basic_form + " (" + conjugated_type + ")"
                 }

@@ -41,61 +41,7 @@
 
     <script>
 
-/*
-"代名詞": "pronoun",
-"副詞": "adverb",
-"助動詞": "auxiliary_verb",
-"助詞-係助詞": "particle(binding)",
-"助詞-副助詞": "particle(adverbial)",
-"助詞-接続助詞": "particle(conjunctive)",
-"助詞-格助詞": "particle(case)",
-"助詞-準体助詞": "particle(nominal)",
-"助詞-終助詞": "particle(phrase_final)",
-"動詞-一般": "verb(general)",
-"動詞-非自立可能": "verb(bound)",
-"名詞-助動詞語幹": "noun(auxiliary)",
-"名詞-固有名詞-一般": "noun(proper.general)",
-"名詞-固有名詞-人名-一般": "noun(proper.name.general)",
-"名詞-固有名詞-人名-名": "noun(proper.name.firstname)",
-"名詞-固有名詞-人名-姓": "noun(proper.name.surname)",
-"名詞-固有名詞-地名-一般": "noun(proper.place.general)",
-"名詞-固有名詞-地名-国": "noun(proper.place.country)",
-"名詞-数詞": "noun(numeral)",
-"名詞-普通名詞-サ変可能": "noun(common.verbal_suru)",
-"名詞-普通名詞-サ変形状詞可能": "noun(common.verbal.adjectival)",
-"名詞-普通名詞-一般": "noun(common.general)",
-"名詞-普通名詞-副詞可能": "noun(common.adverbial)",
-"名詞-普通名詞-助数詞可能": "noun(common.counter)",
-"名詞-普通名詞-形状詞可能": "noun(common.adjectival)",
-"形容詞-一般": "adjective_i(general)",
-"形容詞-非自立可能": "adjective_i(bound)",
-"形状詞-タリ": "adjectival_noun(tari)",
-"形状詞-一般": "adjectival_noun(general)",
-"形状詞-助動詞語幹": "adjectival_noun(auxiliary)",
-"感動詞-フィラー": "interjection(filler)",
-"感動詞-一般": "interjection(general)",
-"接尾辞-動詞的": "suffix(verbal)",
-"接尾辞-名詞的-サ変可能": "suffix(nominal.verbal_suru)",
-"接尾辞-名詞的-一般": "suffix(nominal.general)",
-"接尾辞-名詞的-副詞可能": "suffix(nominal.adverbial)",
-"接尾辞-名詞的-助数詞": "suffix(nominal.counter)",
-"接尾辞-形容詞的": "suffix(adjective_i)",
-"接尾辞-形状詞的": "suffix(adjectival_noun)",
-"接続詞": "conjunction",
-"接頭辞": "prefix",
-"空白": "whitespace",
-"補助記号-ＡＡ-一般": "supplementary_symbol(ascii_art.general)",
-"補助記号-ＡＡ-顔文字": "supplementary_symbol(ascii_art.emoticon)",
-"補助記号-一般": "supplementary_symbol(general)",
-"補助記号-句点": "supplementary_symbol(period)",
-"補助記号-括弧閉": "supplementary_symbol(bracketopen)",
-"補助記号-括弧開": "supplementary_symbol(bracketclose)",
-"補助記号-読点": "supplementary_symbol(comma)",
-"記号-一般": "symbol(general)",
-"記号-文字": "symbol(character)",
-"連体詞": "adnominal",
-*/
-
+        // see also https://www.sketchengine.eu/tagset-jp-mecab/
         const TAGS = {
             '動詞': 'verb',
             '名詞': 'noun',
@@ -114,38 +60,41 @@
             '記号': 'symbol',
 
             "一般": "general",
+            "人名": "name",
+            "助数詞": "counter",
             "固有名詞": "proper",
             "係助詞": "binding",
             "格助詞": "case",
             "並立助詞": "connecting",
+            "接続助詞": "conjunctive",
             "自立": "independent",
-            "非自立": "not independent",
-            "副詞可能": "possible adverb",
+            "非自立": "dependent",
+            "非自立可能": "bound",
+            "副詞可能": "adverbial",
+            "準体助詞": "nominal",
+            "名詞的": "nominal",
+            "動詞的": "verbal",
             "連体化": "noun-modifying",
             "助動詞語幹": "auxiliary",
             "引用": "quotative",
             "サ変接続": "suru-verbal",
+            "終助詞": "phrase-final",
             "地域": "toponym",
+            "句点": "period",
         }
 
         const INFLECTIONS = {
             '語幹': 'stem',
-
             '未然形': 'negative base',
-
             '意志推量形': 'volitive base',
-
             '連用形': 'masu base',
             '連用タ接続': 'te base',
-
             '終止形': 'terminal form',
             '基本形': 'regular form',
             '已然形': 'positive base',
             '連体形': 'attributive base',
-
             '仮定形': 'hypothetic base',
             '命令形': 'imperative base',
-
             'ク語法': 'nominalized "ku" form',
         }
 

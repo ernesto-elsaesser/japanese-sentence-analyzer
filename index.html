@@ -6,22 +6,37 @@
     <title>Japanese Morphological Analyzer</title>
     <script src="kuromoji.js"></script>
     <style>
-        table {
-            border: 1px solid;
+        form {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        textarea {
+            flex-grow: 1;
+        }
+        button {
+            font-size: 18px;
+            margin-left: 5px;
         }
         th, td {
             border: 1px solid;
             padding: 5px 10px;
         }
+        a {
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
 
-    <textarea id="input" cols="64">引数にファイルを与えると, そのファイルが解析対象となります</textarea>
-    <button id="button" disabled>Loading</button>
+    <form>
+        <textarea id="input" cols="64"></textarea>
+        <button type="button" id="clear" onclick="clear()">X</button>
+        <button type="button" id="run" disabled>RUN</button>
+    </form>
 
     <table>
-        <tbody id="output"></tbody>
+        <tbody id="output">
+        </tbody>
     </table>
 
     <script>
@@ -99,8 +114,10 @@
             '記号': 'symbol',
 
             "一般": "general",
+            "固有名詞": "proper",
             "係助詞": "binding",
             "格助詞": "case",
+            "並立助詞": "connecting",
             "自立": "independent",
             "非自立": "not independent",
             "副詞可能": "possible adverb",
@@ -108,6 +125,7 @@
             "助動詞語幹": "auxiliary",
             "引用": "quotative",
             "サ変接続": "suru-verbal",
+            "地域": "toponym",
         }
 
         const INFLECTIONS = {
@@ -132,41 +150,32 @@
         }
 
         const input = document.getElementById("input")
-        const button = document.getElementById("button")
+        const button = document.getElementById("run")
         const output = document.getElementById("output")
 
-        async function lookup(word_id, word) {
-            const res = await fetch("dic.php?q=" + word)
-            const html = await res.text()
-            const lines = html.split("\n")
-            const preIndex = lines.indexOf("<pre>")
-            const td = document.getElementById(word_id)
-            let result = "---"
-            if (preIndex != -1) {
-                const match = lines[preIndex + 1]
-                result = match.split("/").slice(1).join("; ")
-            }
-            td.innerText = result
-        }
-
         function present(tokens) {
-            let table = "<tr><th>Token</th><th>Reading</th><th>POS</th><th>Conjugation</th><th>Translation</th></tr>"
+            let rows = ""
 
             for (let token of tokens) {
-                word_id = token["word_id"].toString()
-                surface_form = token["surface_form"]
-                reading = token["reading"] || ""
-                pos = token["pos"]
-                pos1 = token["pos_detail_1"]
-                pos2 = token["pos_detail_2"]
-                pos3 = token["pos_detail_3"]
-                basic_form = token["basic_form"]
-                conjugated_type = token["conjugated_type"]
-                conjugated_form = token["conjugated_form"]
+                const surface_form = token["surface_form"]
+                const reading = token["reading"] || ""
+                const pos = token["pos"]
+                const pos1 = token["pos_detail_1"]
+                const pos2 = token["pos_detail_2"]
+                const pos3 = token["pos_detail_3"]
+                const conjugated_form = token["conjugated_form"]
+                const basic_form = token["basic_form"]
+                const conjugated_type = token["conjugated_type"]
 
-                if (basic_form != surface_form && basic_form != "*") surface_form = surface_form + " (" + basic_form + ")"
-                table += "<tr><td>" + surface_form + "</td>"
-                table += "<td>" + reading + "</td>"
+                const query = basic_form == "*" ? surface_form : basic_form
+                const jisho_link = "https://jisho.org/search/" + query
+
+                const code = surface_form.charCodeAt(0)
+                const is_kanji = (code >= 0x4E00 && code <= 0x9FFF)
+
+                rows += '<tr><td><a href="' + jisho_link + '">' + surface_form + "</a>"
+                if (is_kanji) rows += "<br/>" + reading
+                rows += "</td>"
 
                 pos_en = TAGS[pos]
                 pos_jp = pos
@@ -176,28 +185,25 @@
                 if (pos2 != "*") pos_jp += ", " + pos2
                 if (pos3 != "*") pos_en += ", " + TAGS[pos3]
                 if (pos3 != "*") pos_jp += ", " + pos3
-
-                table += "<td>" + pos_en + "<br/>" + pos_jp + "</td>"
-
-                if (conjugated_type == "*") table += "<td></td>"
-                else table += "<td>" + INFLECTIONS[conjugated_form] + ": " + conjugated_type + "</td>"
-
-                if (surface_form.length > 1) {
-                    table += '<td id="' + word_id + '">...</td>'
-                    lookup(word_id, surface_form)
-                } else {
-                    table += '<td></td>'
+                rows += "<td>" + pos_en + "<br/>" + pos_jp
+                if (conjugated_type != "*") {
+                    rows += "<br/>" + INFLECTIONS[conjugated_form] + " of " + basic_form + " (" + conjugated_type + ")"
                 }
-
-                table += "</tr>"
-
+                rows += "</td></tr>"
             }
-            output.innerHTML = table
+            output.innerHTML = rows
+        }
+        
+        function clear() {
+            input.value = ""
         }
 
         kuromoji.builder({ dicPath: "dict" }).build(function (err, tokenizer) {
-            button.onclick = () => present(tokenizer.tokenize(input.value))
-            button.innerText = "Tokenize"
+            button.onclick = function() {
+                const sentence = input.value.replace(/\s/g, "")
+                const tokens = tokenizer.tokenize(sentence)
+                present(tokens)
+            }
             button.disabled = false
         });
 

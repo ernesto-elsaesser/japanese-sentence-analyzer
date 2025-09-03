@@ -30,8 +30,8 @@
 
     <form>
         <textarea id="input" cols="64"></textarea>
-        <button type="button" id="clear" onclick="clear()">X</button>
-        <button type="button" id="run" disabled>RUN</button>
+        <button type="button" id="clear" onclick="clearInput()">🗑️</button>
+        <button type="button" id="run" disabled>▶️</button>
     </form>
 
     <table>
@@ -114,18 +114,31 @@
         }
 
         const INFLECTIONS = {
-            '語幹': 'Stem',
-            '未然形': 'Negative base',
-            '意志推量形': 'Volitive base',
-            '連用形': 'MASU base',
-            '連用タ接続': 'TE base',
-            '終止形': 'Terminal form',
-            '基本形': 'Regular form',
-            '已然形': 'Positive base',
-            '連体形': 'Attributive base',
-            '仮定形': 'Hypothetic base',
-            '命令形': 'Imperative base',
-            'ク語法': 'Nominalized KU form',
+            // u
+            "語幹": "Stem",
+            "基本形": "Regular form",
+            "終止形": "Terminal form",
+            "連体形": "Attributive form",
+
+            // e
+            "仮定形": "Hypothetical form",  // for conditional
+            "命令ｅ": "Imperative",
+            // NOTE: no 可能形 = Potential form, tagged as either
+            // Irrealis form + (ra)reru or Regular form of the *eru verb
+
+            // a
+            "未然形": "Irrealis form", // for negative, passive, causative, potential
+
+            // o
+            "未然ウ接続": "Tentative form", // irrealis o-derivate; for volitional/tentative
+
+            // i
+            "連用形": "Conjunctive form", // for past, desire, te, masu
+            "連用タ接続": "Conjunctive form (+TA)",
+            "連用ニ接続": "Conjunctive form (+NI)",
+            "連用テ接続": "Conjunctive form (+TE)",
+
+            "ガル接続": "Verbal adjective (+GARU)",
         }
 
         const input = document.getElementById("input")
@@ -165,14 +178,16 @@
                 rows += "<td>" + TAGS[tags.join(",")]
                 rows += "<br/>" + tags.filter(t => t != "*").join(", ")
                 if (conjugated_type != "*") {
-                    rows += "<br/>" + INFLECTIONS[conjugated_form] + " of " + basic_form + " (" + conjugated_type + ")"
+                    let form = INFLECTIONS[conjugated_form]
+                    if (form == undefined) form = conjugated_form
+                    rows += "<br/>" + form + " of " + basic_form + " (" + conjugated_type + ")"
                 }
                 rows += "</td></tr>"
             }
             output.innerHTML = rows
         }
         
-        function clear() {
+        function clearInput() {
             input.value = ""
         }
 

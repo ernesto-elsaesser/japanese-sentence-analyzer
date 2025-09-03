@@ -114,17 +114,17 @@
         }
 
         const INFLECTIONS = {
-            // u
             "語幹": "Stem",
+
+            // u
             "基本形": "Regular form",
-            "終止形": "Terminal form",
-            "連体形": "Attributive form",
+            // NOTE: old 終止形=Terminal and 連体形=Attributive not used
 
             // e
             "仮定形": "Hypothetical form",  // for conditional
             "命令ｅ": "Imperative",
-            // NOTE: no 可能形 = Potential form, tagged as either
-            // Irrealis form + (ra)reru or Regular form of the *eru verb
+            // NOTE: no 可能形=Potential, tagged as either
+            // Irrealis + (ra)reru or Regular form of the *eru version
 
             // a
             "未然形": "Irrealis form", // for negative, passive, causative, potential
@@ -134,11 +134,17 @@
 
             // i
             "連用形": "Conjunctive form", // for past, desire, te, masu
-            "連用タ接続": "Conjunctive form (+TA)",
-            "連用ニ接続": "Conjunctive form (+NI)",
-            "連用テ接続": "Conjunctive form (+TE)",
+            "連用タ接続": "Conjunctive form (-TA)",
+            "連用ニ接続": "Conjunctive form (-NI)",
+            "連用テ接続": "Conjunctive form (-TE)",
 
-            "ガル接続": "Verbal adjective (+GARU)",
+            // special
+            "体言接続": "Noun connection form",
+            "ガル接続": "Verbal form (-GARU)",
+
+            // classical
+            // 文語基本形
+            // 未然ヌ接続
         }
 
         const input = document.getElementById("input")
